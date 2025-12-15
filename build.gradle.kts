@@ -32,9 +32,10 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-webclient")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 //    implementation("org.springframework.boot:spring-boot-starter-zipkin")
-    implementation("io.micrometer:micrometer-tracing-bridge-brave")
 
     implementation("io.micrometer:context-propagation")
+    implementation("io.micrometer:micrometer-tracing-bridge-brave")
+//    implementation("io.micrometer:micrometer-tracing-bridge-otel")
 
     compileOnly("org.projectlombok:lombok")
     testCompileOnly("org.projectlombok:lombok")

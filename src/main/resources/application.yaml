@@ -2,6 +2,14 @@ management:
   tracing:
     sampling:
       probability: 1
+    baggage:
+      correlation:
+        fields:
+          - baggage
+#      local-fields:
+#        - "abc"
+      remote-fields:
+        - baggage
 
 spring:
   application:
