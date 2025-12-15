@@ -1,0 +1,16 @@
+management:
+  tracing:
+    sampling:
+      probability: 1
+
+spring:
+  application:
+    name: demo-tracing
+  reactor:
+    context-propagation: auto
+
+logging:
+  pattern:
+    correlation: "[${spring.application.name:},%X{traceId:-},%X{spanId:-}] "
+  include-application-name: false
+  include-application-group: false
