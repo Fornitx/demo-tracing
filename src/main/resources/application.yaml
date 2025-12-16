@@ -5,11 +5,11 @@ management:
     baggage:
       correlation:
         fields:
-          - baggage
-#      local-fields:
-#        - "abc"
+          - 'abc'
+      local-fields:
+        - 'abc'
       remote-fields:
-        - baggage
+        - 'abc'
 
 spring:
   application:

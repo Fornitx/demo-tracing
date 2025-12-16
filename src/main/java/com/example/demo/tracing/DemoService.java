@@ -1,7 +1,6 @@
 package com.example.demo.tracing;
 
-import io.micrometer.tracing.BaggageInScope;
-import io.micrometer.tracing.Tracer;
+import brave.baggage.BaggageField;
 import io.micrometer.tracing.annotation.NewSpan;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,13 +12,11 @@ import java.time.LocalDateTime;
 @RequiredArgsConstructor
 @Slf4j
 class DemoService {
-    private final Tracer tracer;
-
     @NewSpan("SPAN_2")
-    public String getDemo(BaggageInScope scope) {
-        var baggage = tracer.getBaggage("baggage");
-
-        log.info("DemoService.getDemo() - {}", baggage.get());
+    public String getDemo() {
+        log.info("getAllValues - {}", BaggageField.getAllValues().size());
+        var value = BaggageUtils.get("abc");
+        log.info("DemoService.getDemo() - '{}'", value);
         return "Response: " + LocalDateTime.now();
     }
 }
