@@ -1,33 +1,39 @@
 package com.example.demo.tracing;
 
-import io.micrometer.tracing.Tracer;
-import io.micrometer.tracing.annotation.NewSpan;
+import io.micrometer.tracing.SpanName;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequiredArgsConstructor
 @Slf4j
 public class DemoController {
     public static final String DEMO = "/demo";
+    public static final String DEMO_REACTIVE = "/demo_reactive";
 
-    private final Tracer tracer;
     private final DemoService service;
 
-    @GetMapping(DEMO)
-    @NewSpan("SPAN_1")
-    public String getDemo() {
-        tracer.currentSpan().tag("abg1", "xyz1");
-
+    @PostMapping(DEMO)
+    @SpanName("KEKES")
+    public String postDemo(@RequestBody String body) {
         BaggageUtils.set("abc", "xyz");
 
-        log.info("Request: GET {}", DEMO);
-        var response = service.getDemo();
+        log.info("Request: POST {}: {}", DEMO, body);
 
-        tracer.currentSpan().end();
+        return service.postDemo(body);
+    }
 
-        return response;
+    @PostMapping(DEMO_REACTIVE)
+    @SpanName("KEKESER")
+    public Mono<String> postDemoReactive(Mono<String> body) {
+        BaggageUtils.set("abc", "xyz");
+
+        log.info("Request: POST {}: {}", DEMO_REACTIVE, body);
+
+        return service.postDemoReactive(body);
     }
 }

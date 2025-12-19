@@ -1,15 +1,10 @@
 management:
   tracing:
-    sampling:
-      probability: 1
     baggage:
+      local-fields: &sleuth_keys
+        - abc
       correlation:
-        fields:
-          - 'abc'
-      local-fields:
-        - 'abc'
-      remote-fields:
-        - 'abc'
+        fields: *sleuth_keys
 
 spring:
   application:
@@ -20,5 +15,6 @@ spring:
 logging:
   pattern:
     correlation: "[${spring.application.name:},%X{traceId:-},%X{spanId:-}] "
+    dateformat: HH:mm:ss.SSS
   include-application-name: false
   include-application-group: false
