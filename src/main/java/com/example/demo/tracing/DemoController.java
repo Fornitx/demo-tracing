@@ -1,6 +1,5 @@
 package com.example.demo.tracing;
 
-import io.micrometer.tracing.SpanName;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,7 +17,6 @@ public class DemoController {
     private final DemoService service;
 
     @PostMapping(DEMO)
-    @SpanName("KEKES")
     public String postDemo(@RequestBody String body) {
         BaggageUtils.set("abc", "xyz");
 
@@ -28,8 +26,7 @@ public class DemoController {
     }
 
     @PostMapping(DEMO_REACTIVE)
-    @SpanName("KEKESER")
-    public Mono<String> postDemoReactive(Mono<String> body) {
+    public Mono<String> postDemoReactive(@RequestBody Mono<String> body) {
         BaggageUtils.set("abc", "xyz");
 
         log.info("Request: POST {}: {}", DEMO_REACTIVE, body);

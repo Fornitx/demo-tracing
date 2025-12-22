@@ -9,6 +9,7 @@ import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTest
 import org.springframework.test.web.reactive.server.WebTestClient;
 
 import static com.example.demo.tracing.DemoController.DEMO;
+import static com.example.demo.tracing.DemoController.DEMO_REACTIVE;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
@@ -20,23 +21,17 @@ class DemoControllerTest {
 
     @Test
     void test1() {
-        var rawResponseBody = webTestClient.post()
-            .uri(DEMO)
-            .bodyValue("123")
-            .exchange()
-            .expectStatus()
-            .isOk()
-            .expectBody(String.class)
-            .returnResult()
-            .getResponseBody();
-
-        log.info("rawResponseBody = {}", rawResponseBody);
+        call(DEMO);
     }
 
     @Test
     void test2() {
+        call(DEMO_REACTIVE);
+    }
+
+    void call(String uri) {
         var rawResponseBody = webTestClient.post()
-            .uri(DEMO)
+            .uri(uri)
             .bodyValue("123")
             .exchange()
             .expectStatus()
