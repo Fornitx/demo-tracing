@@ -1,5 +1,6 @@
 package com.example.demo.tracing;
 
+import io.micrometer.tracing.Tracer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,6 +16,7 @@ public class DemoController {
     public static final String DEMO_REACTIVE = "/demo_reactive";
 
     private final DemoService service;
+    private final Tracer tracer;
 
     @PostMapping(DEMO)
     public String postDemo(@RequestBody String body) {

@@ -33,14 +33,14 @@ dependencies {
     implementation("io.micrometer:micrometer-tracing-bridge-brave")
     implementation("io.micrometer:context-propagation")
 
+    implementation("net.logstash.logback:logstash-logback-encoder:9.0")
+
     compileOnly("org.projectlombok:lombok")
     testCompileOnly("org.projectlombok:lombok")
     annotationProcessor("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
 
     annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
-
-    runtimeOnly("net.logstash.logback:logstash-logback-encoder:9.0")
 
     testImplementation("org.springframework.boot:spring-boot-micrometer-tracing-test")
     testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
