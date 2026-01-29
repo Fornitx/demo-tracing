@@ -1,0 +1,6 @@
+spring:
+  kafka:
+    bootstrap-servers: ${TC_KAFKA}
+    consumer:
+      auto-offset-reset: earliest
+      group-id: demo

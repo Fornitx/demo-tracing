@@ -9,4 +9,6 @@
     </root>
 
     <logger name="com.example" level="DEBUG"/>
+
+    <logger name="org.apache.kafka" level="WARN"/>
 </configuration>

@@ -8,7 +8,6 @@ plugins {
 
 group = "com.example"
 version = "0.0.1-SNAPSHOT"
-description = "Demo project for Spring Boot"
 
 java {
     toolchain {
@@ -28,10 +27,13 @@ configurations {
 dependencies {
     implementation("org.springframework.boot:spring-boot-micrometer-tracing-brave")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
+    implementation("org.springframework.boot:spring-boot-starter-kafka")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     implementation("io.micrometer:micrometer-tracing-bridge-brave")
     implementation("io.micrometer:context-propagation")
+
+    implementation("io.projectreactor.kafka:reactor-kafka:1.3.25")
 
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
 
@@ -44,7 +46,14 @@ dependencies {
 
     testImplementation("org.springframework.boot:spring-boot-micrometer-tracing-test")
     testImplementation("org.springframework.boot:spring-boot-starter-actuator-test")
+    testImplementation("org.springframework.boot:spring-boot-starter-kafka-test") {
+        exclude(group = "org.apache.kafka")
+    }
     testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+
+    testImplementation("org.testcontainers:testcontainers-junit-jupiter")
+    testImplementation("org.testcontainers:testcontainers-kafka")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
@@ -56,3 +65,5 @@ tasks.withType<Test> {
 tasks.jar {
     enabled = false
 }
+
+tasks.register<DependencyReportTask>("allDeps")

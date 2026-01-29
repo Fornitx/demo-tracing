@@ -1,5 +1,6 @@
 package com.example.demo.tracing;
 
+import com.example.demo.tracing.utils.Profiles;
 import io.micrometer.tracing.Tracer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,19 +11,18 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 
 import java.time.Duration;
 import java.util.concurrent.CountDownLatch;
 
-import static com.example.demo.tracing.RuntimeConfig.BATCH_PROFILE;
 import static net.logstash.logback.marker.Markers.appendEntries;
 
-@Profile(BATCH_PROFILE)
+@Profile(Profiles.BATCH)
 @Configuration
 @RequiredArgsConstructor
 public class RuntimeConfig {
-    public static final String BATCH_PROFILE = "batch";
-
     private final Tracer tracer;
 
     @Bean
@@ -42,10 +42,12 @@ public class RuntimeConfig {
 
         @EventListener(ApplicationStartedEvent.class)
         public void start() {
-            var span = tracer.nextSpan().name("span1");
-            try (var _ = tracer.withSpan(span.start())) {
-                tracer.getBaggage("abc").makeCurrent("xyz");
-                log.info("Started");
+            for (var i = 0; i < 5; i++) {
+                var span = tracer.nextSpan().name("span1");
+                try (var _ = tracer.withSpan(span.start())) {
+                    tracer.getBaggage("abc").makeCurrent("xyz " + i);
+                    log.info("Started {}", i);
+                }
             }
         }
     }
@@ -54,34 +56,40 @@ public class RuntimeConfig {
     @Slf4j
     public static class ReactiveRuntimeComponent {
         private final Tracer tracer;
+        private final Scheduler scheduler = Schedulers.newSingle("abc");
 
         @EventListener(ApplicationStartedEvent.class)
         public void start() throws InterruptedException {
-            var latch = new CountDownLatch(1);
+            for (var i = 0; i < 5; i++) {
+                var finalI = i;
+                var latch = new CountDownLatch(1);
 
-            var span = tracer.nextSpan().name("span2").start();
-            Mono.fromCallable(() -> 123)
-                .delayElement(Duration.ofMillis(100))
-                .doOnNext(_ -> {
-                    try (var _ = tracer.withSpan(span)) {
-                        tracer.getBaggage("abc").makeCurrent("xyz");
-                    }
-                })
-                .delayElement(Duration.ofMillis(100))
-                .doOnNext(_ -> {
-                    try (var _ = tracer.withSpan(span)) {
-                        log.info(appendEntries(tracer.getAllBaggage()), "Started 1");
-                        log.info("Started 2", StructuredArguments.entries(tracer.getAllBaggage()));
-                        log.info("Started 3: abc = {}", tracer.getBaggage("abc").get());
-                    }
-                })
-                .doFinally(_ -> {
-                    span.end();
-                    latch.countDown();
-                })
-                .subscribe();
+                var span = tracer.nextSpan().name("span2").start();
+                Mono.fromCallable(() -> 123)
+                    .publishOn(scheduler)
+                    .delayElement(Duration.ofMillis(100))
+                    .doOnNext(_ -> {
+                        try (var _ = tracer.withSpan(span)) {
+                            tracer.getBaggage("abc").makeCurrent("xyz");
+                        }
+                    })
+                    .delayElement(Duration.ofMillis(100))
+                    .doOnNext(_ -> {
+                        try (var _ = tracer.withSpan(span)) {
+                            log.info(appendEntries(tracer.getAllBaggage()), "Started {}-1", finalI);
+                            log.info("Started {}-2", finalI, StructuredArguments.entries(tracer.getAllBaggage()));
+                            log.info("Started {}-3: abc = {}", finalI, tracer.getBaggage("abc").get());
+                        }
+                    })
+                    .doFinally(_ -> {
+                        span.end();
+                        latch.countDown();
+                    })
+                    .subscribeOn(scheduler)
+                    .subscribe();
 
-            latch.await();
+                latch.await();
+            }
         }
     }
 }

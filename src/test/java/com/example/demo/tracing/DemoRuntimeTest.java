@@ -1,15 +1,14 @@
 package com.example.demo.tracing;
 
+import com.example.demo.tracing.utils.Profiles;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.micrometer.tracing.test.autoconfigure.AutoConfigureTracing;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 
-import static com.example.demo.tracing.RuntimeConfig.BATCH_PROFILE;
-
 @SpringBootTest
 @AutoConfigureTracing
-@ActiveProfiles(BATCH_PROFILE)
+@ActiveProfiles(Profiles.BATCH)
 class DemoRuntimeTest {
 	@Test
 	void test() {
