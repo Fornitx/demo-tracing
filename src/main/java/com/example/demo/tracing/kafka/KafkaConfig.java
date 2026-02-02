@@ -3,6 +3,7 @@ package com.example.demo.tracing.kafka;
 import com.example.demo.tracing.utils.Profiles;
 import io.micrometer.tracing.Tracer;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.kafka.autoconfigure.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Profile(Profiles.KAFKA)
 @Configuration
+@EnableConfigurationProperties(KafkaProperties.class)
 @RequiredArgsConstructor
 public class KafkaConfig {
     private final KafkaProperties kafkaProperties;
@@ -27,7 +29,7 @@ public class KafkaConfig {
     }
 
     @Bean
-    public KafkaService kafkaService(KafkaReceiver<String, String> receiver, Tracer tracer) {
-        return new KafkaService(new KafkaSleuthReceiver<>(receiver, tracer));
+    public KafkaService kafkaService(KafkaReceiver<String, String> receiver, Tracer tracer, brave.Tracer braveTracer) {
+        return new KafkaService(new KafkaSleuthReceiver<>(receiver, tracer, braveTracer), tracer, braveTracer);
     }
 }

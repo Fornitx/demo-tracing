@@ -17,7 +17,13 @@ import static com.example.demo.tracing.kafka.tc.TestcontainersConfiguration.DOCK
 @Slf4j
 public class DemoKafkaContainer extends KafkaContainer {
     public static final String TOPIC_1 = "topic1";
-    private static final KafkaContainer INSTANCE = new DemoKafkaContainer(DOCKER_IMAGE_NAME).withReuse(true);
+    private static final KafkaContainer INSTANCE = new DemoKafkaContainer(DOCKER_IMAGE_NAME)
+        .withReuse(true)
+        .withEnv("KAFKA_GROUP_CONSUMER_MIN_HEARTBEAT_INTERVAL_MS", "1000")
+        .withEnv("KAFKA_GROUP_CONSUMER_MIN_SESSION_TIMEOUT_MS", "1000")
+        .withEnv("KAFKA_GROUP_MIN_HEARTBEAT_INTERVAL_MS", "1000")
+        .withEnv("KAFKA_GROUP_MIN_SESSION_TIMEOUT_MS", "1000")
+        ;
 
     public static KafkaContainer instance() {
         return INSTANCE;

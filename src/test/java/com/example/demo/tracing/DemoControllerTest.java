@@ -1,7 +1,7 @@
 package com.example.demo.tracing;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.RepeatedTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.micrometer.tracing.test.autoconfigure.AutoConfigureTracing;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -19,13 +19,13 @@ class DemoControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    @Test
-    void test1() {
+    @RepeatedTest(2)
+    void test() {
         call(DEMO);
     }
 
-    @Test
-    void test2() {
+    @RepeatedTest(2)
+    void testReactive() {
         call(DEMO_REACTIVE);
     }
 

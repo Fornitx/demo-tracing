@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import java.time.Duration;
+
 @RestController
 @RequiredArgsConstructor
 @Slf4j
@@ -33,6 +35,8 @@ public class DemoController {
 
         log.info("Request: POST {}: {}", DEMO_REACTIVE, body);
 
-        return service.postDemoReactive(body);
+        return body
+            .delayElement(Duration.ofMillis(1))
+            .flatMap(service::postDemoReactive);
     }
 }
