@@ -2,10 +2,12 @@ package com.example.demo.tracing;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.kafka.autoconfigure.KafkaAutoConfiguration;
 import reactor.core.publisher.Hooks;
 
 @SpringBootApplication(exclude = KafkaAutoConfiguration.class)
+@EnableConfigurationProperties(DemoProperties.class)
 public class DemoTracingApplication {
 
 	public static void main(String[] args) {

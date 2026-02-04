@@ -33,6 +33,7 @@ dependencies {
     implementation("io.micrometer:micrometer-tracing-bridge-brave")
     implementation("io.micrometer:context-propagation")
 
+    implementation("io.projectreactor:reactor-core-micrometer")
     implementation("io.projectreactor.kafka:reactor-kafka:1.3.25")
 
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")

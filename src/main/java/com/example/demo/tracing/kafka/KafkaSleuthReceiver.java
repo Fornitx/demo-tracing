@@ -18,17 +18,16 @@ public class KafkaSleuthReceiver<K, V> {
 
     public Flux<Spanned<ReceiverRecord<K, V>>> receive() {
         return receiver.receive()
-//            .delayElements(Duration.ofMillis(1))
+            .delayElements(Duration.ofMillis(1))
             .map(receiverRecord -> {
                 log.info("ReceiverRecord before {}", receiverRecord.receiverOffset());
-//                tracer.startScopedSpan("SCOPE_1");
-//                braveTracer.startScopedSpan("SCOPE_1");
-//                braveTracer.withSpanInScope(braveTracer.nextSpan().name("scope_1"));
-
                 var span = tracer.nextSpan().name("SCOPE_1");
+                tracer.getBaggage(span.context(), "abc")
+                    .makeCurrent(span.context(), "xyz " + receiverRecord.receiverOffset().toString());
                 try (var _ = tracer.withSpan(span)) {
-                    log.info("ReceiverRecord after {}", receiverRecord.receiverOffset());
+                    log.info("ReceiverRecord in span {}", receiverRecord.receiverOffset());
                 }
+                log.info("ReceiverRecord after {}", receiverRecord.receiverOffset());
 
                 return new Spanned<>(receiverRecord, span);
             })

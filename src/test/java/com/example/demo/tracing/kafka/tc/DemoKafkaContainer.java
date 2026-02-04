@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Map;
 
 import static com.example.demo.tracing.kafka.tc.TestcontainersConfiguration.DOCKER_IMAGE_NAME;
+import static com.example.demo.tracing.utils.Constants.TOPIC_1;
 
 @Slf4j
 public class DemoKafkaContainer extends KafkaContainer {
-    public static final String TOPIC_1 = "topic1";
     private static final KafkaContainer INSTANCE = new DemoKafkaContainer(DOCKER_IMAGE_NAME)
         .withReuse(true)
         .withEnv("KAFKA_GROUP_CONSUMER_MIN_HEARTBEAT_INTERVAL_MS", "1000")

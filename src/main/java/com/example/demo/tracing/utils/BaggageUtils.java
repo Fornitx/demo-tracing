@@ -1,4 +1,4 @@
-package com.example.demo.tracing;
+package com.example.demo.tracing.utils;
 
 import brave.baggage.BaggageField;
 import lombok.experimental.UtilityClass;
@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.Locale;
 
 @UtilityClass
+@Deprecated
 @Slf4j
 public class BaggageUtils {
     public static String get(String name) {

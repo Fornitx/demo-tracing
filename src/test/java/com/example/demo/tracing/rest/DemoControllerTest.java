@@ -1,15 +1,18 @@
-package com.example.demo.tracing;
+package com.example.demo.tracing.rest;
 
+import com.example.demo.tracing.bh.BlackHole;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.RepeatedTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.micrometer.tracing.test.autoconfigure.AutoConfigureTracing;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.reactive.server.WebTestClient;
 
-import static com.example.demo.tracing.DemoController.DEMO;
-import static com.example.demo.tracing.DemoController.DEMO_REACTIVE;
+import static com.example.demo.tracing.rest.DemoController.DEMO;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
 
 @SpringBootTest
 @AutoConfigureWebTestClient
@@ -19,19 +22,13 @@ class DemoControllerTest {
     @Autowired
     private WebTestClient webTestClient;
 
-    @RepeatedTest(2)
-    void test() {
-        call(DEMO);
-    }
+    @MockitoBean
+    private BlackHole bh;
 
     @RepeatedTest(2)
     void testReactive() {
-        call(DEMO_REACTIVE);
-    }
-
-    void call(String uri) {
         var rawResponseBody = webTestClient.post()
-            .uri(uri)
+            .uri(DEMO)
             .bodyValue("123")
             .exchange()
             .expectStatus()
@@ -41,5 +38,7 @@ class DemoControllerTest {
             .getResponseBody();
 
         log.info("rawResponseBody = {}", rawResponseBody);
+
+        verify(bh).traceIdAndSpanId(anyString(), anyString());
     }
 }

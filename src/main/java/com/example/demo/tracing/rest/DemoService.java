@@ -1,6 +1,9 @@
-package com.example.demo.tracing;
+package com.example.demo.tracing.rest;
 
 import brave.baggage.BaggageField;
+import com.example.demo.tracing.bh.BlackHole;
+import com.example.demo.tracing.utils.BaggageUtils;
+import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.Tracer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,22 +16,16 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-class DemoService {
+public class DemoService {
+    private final ObservationRegistry observationRegistry;
+    private final BlackHole bh;
     private final Tracer tracer;
-
-    public String postDemo(String body) {
-        var span = tracer.currentSpan().context();
-        log.info("spanId = '{}', traceId = '{}'", span.spanId(), span.traceId());
-        log.info("getAllValues - {}", BaggageField.getAllValues().size());
-        var value = Objects.requireNonNull(BaggageUtils.get("abc"));
-        log.info("DemoService.postDemo({}) - '{}'", body, value);
-        return "Response: " + LocalDateTime.now();
-    }
 
     public Mono<String> postDemoReactive(String body) {
         return Mono.fromCallable(() -> {
-            var span = tracer.currentSpan().context();
-            log.info("spanId = '{}', traceId = '{}'", span.spanId(), span.traceId());
+            var context = tracer.currentSpan().context();
+            log.info("traceId = '{}', spanId = '{}'", context.traceId(), context.spanId());
+            bh.traceIdAndSpanId(context.traceId(), context.spanId());
             log.info("getAllValues - {}", BaggageField.getAllValues().size());
             var value = Objects.requireNonNull(BaggageUtils.get("abc"));
             log.info("DemoService.postDemoReactive({}) - '{}'", body, value);

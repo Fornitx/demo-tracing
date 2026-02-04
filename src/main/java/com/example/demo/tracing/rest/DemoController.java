@@ -1,6 +1,6 @@
-package com.example.demo.tracing;
+package com.example.demo.tracing.rest;
 
-import io.micrometer.tracing.Tracer;
+import com.example.demo.tracing.utils.BaggageUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,28 +15,25 @@ import java.time.Duration;
 @Slf4j
 public class DemoController {
     public static final String DEMO = "/demo";
-    public static final String DEMO_REACTIVE = "/demo_reactive";
 
     private final DemoService service;
-    private final Tracer tracer;
+
+    private final ThreadLocal<Integer> tl = ThreadLocal.withInitial(() -> 111);
 
     @PostMapping(DEMO)
-    public String postDemo(@RequestBody String body) {
+    public Mono<String> postDemoReactive(@RequestBody Mono<String> body) {
+        log.info("BaggageUtils.set");
         BaggageUtils.set("abc", "xyz");
+
+        tl.set(222);
 
         log.info("Request: POST {}: {}", DEMO, body);
 
-        return service.postDemo(body);
-    }
-
-    @PostMapping(DEMO_REACTIVE)
-    public Mono<String> postDemoReactive(@RequestBody Mono<String> body) {
-        BaggageUtils.set("abc", "xyz");
-
-        log.info("Request: POST {}: {}", DEMO_REACTIVE, body);
-
         return body
             .delayElement(Duration.ofMillis(1))
+            .doOnNext(_ -> {
+                log.info("ThreadLocal = {}", tl.get());
+            })
             .flatMap(service::postDemoReactive);
     }
 }
