@@ -4,5 +4,6 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class Constants {
+    public static final String X_TRACE_ID = "X-Trace-Id";
     public static final String TOPIC_1 = "topic1";
 }

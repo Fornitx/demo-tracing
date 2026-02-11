@@ -1,6 +1,8 @@
 package com.example.demo.tracing.kafka;
 
 import com.example.demo.tracing.kafka.deprecated.ReactiveKafkaConsumerTemplate;
+import com.example.demo.tracing.utils.TracingUtils;
+import io.micrometer.tracing.Span;
 import io.micrometer.tracing.Tracer;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +11,8 @@ import reactor.kafka.receiver.ReceiverRecord;
 import reactor.util.retry.Retry;
 
 import java.time.Duration;
+
+import static com.example.demo.tracing.utils.Constants.X_TRACE_ID;
 
 @RequiredArgsConstructor
 @Slf4j
@@ -26,9 +30,17 @@ public class KafkaSleuthReceiver<K, V> {
             .handle((receiverRecord, sink) -> {
                 try {
                     log.info("ReceiverRecord before {}", receiverRecord.receiverOffset());
-                    var span = tracer.nextSpan().name("SCOPE_1");
+
+                    var header = receiverRecord.headers().lastHeader(X_TRACE_ID);
+                    Span span;
+                    if (header == null) {
+                        span = tracer.nextSpan().name("SCOPE_1");
+                    } else {
+                        span = TracingUtils.newSpanFromTraceIdHeaderValue(new String(header.value()), tracer);
+                    }
+
                     tracer.getBaggage(span.context(), "abc")
-                        .makeCurrent(span.context(), "xyz " + receiverRecord.receiverOffset().toString());
+                        .set(span.context(), "xyz " + receiverRecord.receiverOffset().toString());
                     try (var _ = tracer.withSpan(span)) {
                         log.info("ReceiverRecord in span {}", receiverRecord.receiverOffset());
                     }

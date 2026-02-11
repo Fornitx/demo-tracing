@@ -37,6 +37,8 @@ dependencies {
     implementation("io.projectreactor:reactor-core-micrometer")
     implementation("io.projectreactor.kafka:reactor-kafka:1.3.25")
 
+    implementation("org.apache.commons:commons-lang3")
+
     implementation("net.logstash.logback:logstash-logback-encoder:9.0")
 
     compileOnly("org.projectlombok:lombok")

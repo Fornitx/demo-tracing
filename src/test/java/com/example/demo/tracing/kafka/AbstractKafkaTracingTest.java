@@ -60,8 +60,12 @@ public abstract class AbstractKafkaTracingTest {
 
     @SneakyThrows
     protected RecordMetadata produce(String topic, String data) {
+        return produce(new ProducerRecord<>(topic, data));
+    }
+
+    @SneakyThrows
+    protected RecordMetadata produce(ProducerRecord<String, String> record) {
         try (var producer = producerFactory.createProducer()) {
-            var record = new ProducerRecord<String, String>(topic, data);
             var recordMetadata = producer.send(record).get(DEFAULT_TIMEOUT.toMillis(), TimeUnit.MILLISECONDS);
             log.debug("Sent {} as {}", KafkaUtils.format(record), recordMetadata);
             return recordMetadata;
