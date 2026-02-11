@@ -28,6 +28,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-micrometer-tracing-brave")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-kafka")
+    implementation("org.springframework.boot:spring-boot-starter-webclient")
     implementation("org.springframework.boot:spring-boot-starter-webflux")
 
     implementation("io.micrometer:micrometer-tracing-bridge-brave")
@@ -50,11 +51,14 @@ dependencies {
     testImplementation("org.springframework.boot:spring-boot-starter-kafka-test") {
         exclude(group = "org.apache.kafka")
     }
+    testImplementation("org.springframework.boot:spring-boot-starter-webclient-test")
     testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
     testImplementation("org.springframework.boot:spring-boot-testcontainers")
 
     testImplementation("org.testcontainers:testcontainers-junit-jupiter")
     testImplementation("org.testcontainers:testcontainers-kafka")
+
+    testImplementation("org.wiremock.integrations:wiremock-spring-boot-standalone:4.1.0")
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }

@@ -1,5 +1,6 @@
 package com.example.demo.tracing.kafka;
 
+import com.example.demo.tracing.rest.DemoClient;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationRegistry;
 import io.micrometer.tracing.Tracer;
@@ -16,8 +17,8 @@ import reactor.kafka.receiver.ReceiverRecord;
 @Slf4j
 public class KafkaService {
     private final KafkaSleuthReceiver<String, String> receiver;
+    private final DemoClient demoClient;
     private final Tracer tracer;
-    private final brave.Tracer braveTracer;
     private final ObservationRegistry observationRegistry;
 
     @EventListener(ApplicationReadyEvent.class)
@@ -25,7 +26,7 @@ public class KafkaService {
         receiver.receive()
             .doOnNext(receiverRecord -> receiverRecord.obj().receiverOffset().acknowledge())
             .flatMap(spanned ->
-                    processRecord(spanned)
+                    processRecord(spanned.obj())
                         .tap(Micrometer.observation(
                             observationRegistry,
                             observationRegistry -> Observation.createNotStarted(
@@ -46,14 +47,16 @@ public class KafkaService {
     }
 
     //    @NewSpan("SCOPE_2")
-    public Mono<?> processRecord(Spanned<ReceiverRecord<String, String>> spannedOrig) {
+    public Mono<?> processRecord(ReceiverRecord<String, String> recordArg) {
 //        try (var _ = tracer.withSpan(spannedOrig.span())) {
-        return Mono.just(spannedOrig)
-            .doOnNext(spanned -> {
+        return Mono.just(recordArg)
+            .doOnNext(record -> {
                 log.info("tracer.currentSpan() = {}", tracer.currentSpan());
-                log.info("braveTracer.currentSpan() = {}", braveTracer.currentSpan());
-                log.info("ReceiverRecord {}", spanned.obj().receiverOffset());
+                log.info("tracer.currentSpan().context().traceId() = {}", tracer.currentSpan().context().traceId());
+                log.info("ReceiverRecord {}", record.receiverOffset());
             })
+            .flatMap(record -> demoClient.call(record.value()))
+            .doOnNext(str -> log.info("Finish - {}", str))
 //                .contextCapture()
 //            .contextWrite(context -> {
 //                ContextSnapshot.setThreadLocalsFrom(context, ObservationThreadLocalAccessor.KEY);
